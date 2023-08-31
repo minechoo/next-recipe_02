@@ -1,18 +1,29 @@
 import clsx from 'clsx';
 import styles from './Navbar.module.scss';
 import { Text } from '../../atoms/text/Text';
+import { useRouter } from 'next/router';
 
 function Navbar({ names, gap }) {
+	const path = useRouter().asPath.split('/')[1];
+	console.log(path);
 	return (
 		<nav className={clsx(styles.gnb)}>
 			{names.map((el) => {
 				const url = el.toLowerCase().split(' ').join('-');
 
-				return (
-					<Text key={url} url={`/${url}`} type={'menu'} tag={'span'}>
-						{el}
-					</Text>
-				);
+				if (path === url) {
+					return (
+						<Text key={url} type={'menu'} tag={'span'} isOn={true}>
+							{el}
+						</Text>
+					);
+				} else {
+					return (
+						<Text key={url} url={`/${url}`} type={'menu'} tag={'span'}>
+							{el}
+						</Text>
+					);
+				}
 			})}
 		</nav>
 	);
