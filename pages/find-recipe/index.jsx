@@ -3,7 +3,7 @@ import styles from './style.module.scss';
 import axios from 'axios';
 import Category from '@/components/molecules/Category/Category';
 import { useRecipeByCategory, useRecipeBySearch } from '@/hooks/useRecipe';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
 import Card from '@/components/molecules/Card/Card';
 import { Title } from '@/components/atoms/text/Title';
@@ -12,18 +12,18 @@ import SearchBar from '@/components/molecules/SearchBar/SearchBar';
 import { Text } from '@/components/atoms/text/Text';
 
 export default function Recipe({ categories }) {
+	const names = useRef([]);
+	//카테고리 컴포넌트에 순수하게 출력해야되는 메뉴명을 배열로 전달해댜되므로
+	//서버에서 받아온 데이터에서 strCategory에 해당하는 메뉴값만 배열로 반환해서 참조객체에 담고 컴포넌트에 전달
+	names.current = categories.map((category) => category.strCategory);
 	const [Selected, setSelected] = useState(categories[0].strCategory);
 	const [Search, setSearch] = useState('');
 
 	const DebouncedSelected = useDebounce(Selected);
 	const DebouncedSearch = useDebounce(Search);
 
-	const { data: dataByCategory, isSuccess: isCategory } = useRecipeByCategory(
-		DebouncedSelected,
-		DebouncedSearch
-	);
-	const { data: dataBySearch, isSuccess: isSearch } =
-		useRecipeBySearch(DebouncedSearch);
+	const { data: dataByCategory, isSuccess: isCategory } = useRecipeByCategory(DebouncedSelected, DebouncedSearch);
+	const { data: dataBySearch, isSuccess: isSearch } = useRecipeBySearch(DebouncedSearch);
 
 	const handleClickCategory = (state) => {
 		setSearch('');
@@ -47,30 +47,18 @@ export default function Recipe({ categories }) {
 
 			<section className={styles.recipePage}>
 				<Category
-					items={categories}
+					items={names.current}
 					onClick={handleClickCategory}
 					active={DebouncedSelected}
 					className={clsx(styles.category)}
 				/>
 
 				<article className={clsx(styles.titBox)}>
-					<Title
-						type={'slogan'}
-						className={clsx(styles.titCategory)}
-						style={{ color: '#bbb', hoverColor: '#bbb' }}
-					>
-						{DebouncedSelected
-							? DebouncedSelected
-							: `Result: ${DebouncedSearch}`}
+					<Title type={'slogan'} className={clsx(styles.titCategory)} style={{ color: '#bbb', hoverColor: '#bbb' }}>
+						{DebouncedSelected ? DebouncedSelected : `Result: ${DebouncedSearch}`}
 					</Title>
 
-					<SearchBar
-						inputType={'text'}
-						isBtn={false}
-						placeholder={'search'}
-						value={Search}
-						onChange={setSearch}
-					/>
+					<SearchBar inputType={'text'} isBtn={false} placeholder={'search'} value={Search} onChange={setSearch} />
 				</article>
 
 				<div className={clsx(styles.listFrame)}>

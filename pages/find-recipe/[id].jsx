@@ -10,8 +10,10 @@ import { useState, useEffect } from 'react';
 import List from '@/components/atoms/List/List';
 import Btn from '@/components/atoms/Button/Btn';
 import { Text } from '@/components/atoms/text/Text';
+import { useThemeClolor } from '@/hooks/useThemeColor';
 
 function Detail() {
+	const { point } = useThemeClolor();
 	const router = useRouter();
 	const { id } = router.query;
 	const { data } = useRecipeById(id);
@@ -60,9 +62,7 @@ function Detail() {
 		if (data) {
 			const keys = Object.keys(data);
 			const filterKeys1 = keys.filter((key) => key.startsWith('strIngredient'));
-			const filterKeys2 = filterKeys1.filter(
-				(key) => data[key] !== '' && data[key] !== null
-			);
+			const filterKeys2 = filterKeys1.filter((key) => data[key] !== '' && data[key] !== null);
 			const ingredients = filterKeys2.map((key, idx) => ({
 				index: idx + 1,
 				ingredient: data[key],
@@ -72,9 +72,7 @@ function Detail() {
 
 			let instructions = data.strInstructions
 				.split('\r\n')
-				.map((text) =>
-					text.includes('.\t') ? text.replace('.\t', '+').split('+')[1] : text
-				)
+				.map((text) => (text.includes('.\t') ? text.replace('.\t', '+').split('+')[1] : text))
 				.filter((text) => text !== '');
 
 			setListData(instructions);
@@ -91,7 +89,7 @@ function Detail() {
 					left: '50%',
 					transform: 'translateX(-50%)',
 				}}
-				color={'orange'}
+				color={point}
 				size={100}
 			/>
 			{data && (
@@ -106,9 +104,7 @@ function Detail() {
 					<Btn onClick={handleSave} className={clsx(Saved && styles.del)}>
 						{Saved ? 'Remove from my Favoraite' : 'Add to my Favorait'}
 					</Btn>
-					{Saved && (
-						<Text>You already added this recipe to your Favoraite.</Text>
-					)}
+					{Saved && <Text>You already added this recipe to your Favoraite.</Text>}
 					<Table data={TableData} title={data.strMeal} />
 
 					<List data={ListData} tag={'ol'} />

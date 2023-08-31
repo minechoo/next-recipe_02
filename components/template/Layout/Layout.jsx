@@ -20,7 +20,7 @@ function Layout({ children }) {
 		const arr = router.asPath.split('/');
 		setPath(arr);
 		setIsShow(false);
-		setIsMain(router.asPath === '/');
+		setIsMain(router.asPath === '/'); //true
 		setTimeout(() => setIsShow(true), 500);
 	}, [router]);
 
